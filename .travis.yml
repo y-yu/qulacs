@@ -8,12 +8,13 @@ env:
       C_COMPILER='gcc-8'
       Fortran_COMPILER='gfortran'
       BUILD_TYPE='Release'
-      PYTHON3='3.6.7'
+      PYTHON3='3.7.5'
+      # Windows chocolatey doesn't release the latest Python2(2.7.15).
       PYTHON2='2.7.11'
 
 matrix:
   include:
-    # 1/ OSX GCC8 PYTHON3.6 build
+    # 1/ OSX GCC8 PYTHON3.7 build
     - os: osx
       osx_image: xcode11.2
       compiler: gcc
@@ -43,7 +44,7 @@ matrix:
             - gcc@8
             - swig
           update: true
-    # 3/ Linux GCC8 PYTHON3.6 build
+    # 3/ Linux GCC8 PYTHON3.7 build
     - os: linux
       dist: trusty
       compiler: gcc
@@ -63,6 +64,7 @@ matrix:
             - gfortran-7
             - lcov
             - swig
+            - libssl-dev
     # 4/ Linux GCC8 PYTHON2.7 build
     - os: linux
       dist: trusty
@@ -84,14 +86,14 @@ matrix:
             - lcov
             - swig
             - libssl-dev
-    # 5/ Windows VS17 PYTHON3.6 build
+    # 5/ Windows VS17 PYTHON3.7 build
     - os: windows
       env:
         - COVERAGE=ON
         - PYTHON="${PYTHON3}"
         - MSBUILD_BIN='C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin'
         - CMAKE_BIN='C:\Program Files\CMake'
-        - PYTHON_BIN='C:\Python36'
+        - PYTHON_BIN='C:\Python37'
         - PATH="$MSBUILD_BIN:$CMAKE_BIN:$PYTHON_BIN:$PYTHON_BIN\Scripts:$PATH"
     # 6/ Windows VS17 PYTHON2.7 build
     - os: windows
@@ -137,7 +139,9 @@ before_install:
       pyenv local "${PYTHON}"
     elif [[ "${TRAVIS_OS_NAME}" != "windows" ]]; then
       eval "$(pyenv init -)"
-      pyenv local "${PYTHON}"
+      pyenv local "${PYTHON}" || \
+        (pyenv install "${PYTHON}" && \
+        pyenv local "${PYTHON}")
     fi
   - python --version
   - python -m pip install --upgrade pip
