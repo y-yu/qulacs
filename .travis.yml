@@ -83,7 +83,7 @@ _wheel_install: &wheel_install
   - python -m pip install cibuildwheel==1.4.2 twine
 
 _wheel_build: &wheel_build
-  - pip install --upgrade certifi
+  - ls "C:\Python37"
   - python -m cibuildwheel --output-dir wheels
 
 _wheel_upload: &wheel_upload
